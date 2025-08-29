@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "Wisdom"
 
 include(":wisdom-core")
+includeBuild("../Tussaud")
