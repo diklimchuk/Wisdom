@@ -1,4 +1,4 @@
-package com.vkontakte.wisdom
+package com.vkontakte.wisdom.old
 
 import kotlinx.coroutines.flow.Flow
 
@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.Flow
  */
 interface CacheElement<T> {
 
-    fun set(value: T)
+    fun put(value: T)
 
-    fun observe(): Flow<T>
+    fun observe(): Flow<T?>
 
     fun clear()
 

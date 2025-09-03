@@ -22,4 +22,8 @@ dependencyResolutionManagement {
 rootProject.name = "Wisdom"
 
 include(":wisdom-core")
-includeBuild("../Tussaud")
+includeBuild("../Tussaud") {
+    dependencySubstitution {
+        substitute(module("com.vkontakte.tussaud:tussaud-core:0.0.1")).using(project(":tussaud-core"))
+    }
+}

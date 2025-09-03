@@ -1,4 +1,4 @@
-package com.vkontakte.wisdom
+package com.vkontakte.wisdom.old
 
 data class Option<T : Any>(
     val value: T?

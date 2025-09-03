@@ -1,15 +1,18 @@
-package com.vkontakte.wisdom
+package com.vkontakte.wisdom.memory
 
+import com.vkontakte.wisdom.old.Cache
+import com.vkontakte.wisdom.old.CacheElement
 import kotlinx.coroutines.flow.Flow
 
-internal class DelegatingCacheHandle<T : Any>(
+internal class DelegatingCacheElement<T : Any>(
     private val key: String,
-    private val cache: Cache
+    private val cache: Cache,
+    private val persistClearing: Boolean,
 ) : CacheElement<T> {
 
-    override fun set(value: T) = cache.put(key, value)
+    override fun put(value: T) = cache.put(key, value, persistClearing)
 
-    override fun observe(): Flow<T> = cache.observe(key)
+    override fun observe(): Flow<T?> = cache.observe(key)
 
     override fun clear() = cache.remove(key)
 

@@ -1,4 +1,4 @@
-package com.vkontakte.wisdom
+package com.vkontakte.wisdom.old
 
 import kotlinx.serialization.json.Json
 import kotlin.reflect.typeOf

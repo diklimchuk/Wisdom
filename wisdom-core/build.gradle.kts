@@ -19,6 +19,7 @@ kotlin {
                 implementation(libs.stately.concurrent.collections)
                 implementation(libs.atomicfu)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+                implementation("com.vkontakte.tussaud:tussaud-core:0.0.1")
             }
         }
         val commonTest by getting {

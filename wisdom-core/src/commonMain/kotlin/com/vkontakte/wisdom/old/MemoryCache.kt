@@ -1,7 +1,8 @@
-package com.vkontakte.wisdom
+package com.vkontakte.wisdom.old
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
 import co.touchlab.stately.collections.ConcurrentMutableSet
+import com.vkontakte.wisdom.memory.DelegatingCacheElement
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,7 @@ class MemoryCache : Cache {
     private val clearableKeys = ConcurrentMutableSet<String>()
     private val cache = ConcurrentMutableMap<String, Pair<SynchronizedObject, MutableStateFlow<Option<Any>>>>()
 
-    override fun <T : Any> put(key: String, value: T) {
+    override fun <T : Any> put(key: String, value: T, persistClearing: Boolean) {
         getSubject<T>(key).second.value = Option(value)
     }
 
@@ -30,13 +31,15 @@ class MemoryCache : Cache {
 
     override fun <T : Any> putIfPresent(
         key: String,
-        newValue: (previousValue: T) -> T,
-    ) = updateInternal<T>(key) { it?.let(newValue) }
+        valueProvider: (previousValue: T) -> T,
+        persistClearing: Boolean
+    ) = updateInternal<T>(key) { it?.let(valueProvider) }
 
     override fun <T : Any> put(
         key: String,
-        newValue: (previousValue: T?) -> T,
-    ) = updateInternal(key, newValue)
+        valueProvider: (previousValue: T?) -> T,
+        persistClearing: Boolean,
+    ) = updateInternal(key, valueProvider)
 
 
     override fun <T : Any> observe(key: String): Flow<T> = getSubject<T>(key).second
@@ -48,10 +51,10 @@ class MemoryCache : Cache {
 
     override fun <T : Any> of(
         key: String,
-        keepAlways: Boolean,
+        persistClearing: Boolean,
     ): CacheElement<T> {
-        if (!keepAlways) clearableKeys.add(key)
-        return DelegatingCacheHandle(key, this)
+        if (!persistClearing) clearableKeys.add(key)
+        return DelegatingCacheElement(key, this, persistClearing)
     }
 
     /**
@@ -59,6 +62,10 @@ class MemoryCache : Cache {
      */
     override fun clear() {
         clearableKeys.forEach { remove(it) }
+    }
+
+    override fun clearWithPersistable() {
+        cache.clear()
     }
 
     override suspend fun updateIfEmpty(key: String) = Unit
