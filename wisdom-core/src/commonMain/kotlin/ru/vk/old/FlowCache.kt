@@ -1,4 +1,4 @@
-package com.vkontakte.wisdom.old
+package ru.vk.old
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

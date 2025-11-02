@@ -1,4 +1,5 @@
-import com.vkontakte.wisdom.memory.Memory
+package ru.vk
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -10,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import money.vivid.elmslie.core.config.TussaudConfig
+import ru.vk.memory.Memory
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

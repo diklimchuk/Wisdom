@@ -1,8 +1,8 @@
-package com.vkontakte.wisdom.old
+package ru.vk.old
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
 import co.touchlab.stately.collections.ConcurrentMutableSet
-import com.vkontakte.wisdom.memory.DelegatingCacheElement
+import ru.vk.memory.DelegatingCacheElement
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ class MemoryCache : Cache {
         cache[key]?.second?.value = Option(null)
     }
 
-    override fun <T : Any> peek(key: String): T? = getSubject<T>(key).second.value.value
+    override suspend fun <T : Any> peek(key: String): T? = getSubject<T>(key).second.value.value
 
     override fun <T : Any> putIfPresent(
         key: String,
@@ -41,6 +41,21 @@ class MemoryCache : Cache {
         persistClearing: Boolean,
     ) = updateInternal(key, valueProvider)
 
+    override fun <T : Any> put(
+        key: String,
+        valueFlowProvider: () -> Flow<T>,
+        persistClearing: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T : Any> putIfPresent(
+        key: String,
+        valueFlowProvider: () -> Flow<T>,
+        persistClearing: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
 
     override fun <T : Any> observe(key: String): Flow<T> = getSubject<T>(key).second
         .filter { it.hasValue }

@@ -1,8 +1,8 @@
-package com.vkontakte.wisdom.flow
+package ru.vk.flow
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
 import co.touchlab.stately.collections.ConcurrentMutableSet
-import com.vkontakte.wisdom.old.Option
+import ru.vk.old.Option
 import kotlinx.coroutines.flow.Flow
 
 data class FlowCacheState(
@@ -15,19 +15,32 @@ sealed class FlowCacheEvent {
     sealed class Input : FlowCacheEvent() {
         data object Init : Input()
 
-        data class Put(
+        data class PutToStorage(
             val key: String,
-            val valueProvider: (Any?) -> Any,
+            /** Retriever for value in storage, should be called in Performer */
             val retriever: () -> Flow<Any>,
-            val persister: () -> Unit,
+            /** Persists value to storage, should eb called in Performer */
+            val persister: (Any) -> Unit,
             val persistClearing: Boolean = false,
         ) : Input()
 
-        data class PutIfPresent(
+        data class PutToState(
+            val key: String,
+            /** Provides value for flow storage cache */
+            val valueProvider: (Any?) -> Any,
+            val persistClearing: Boolean = false,
+        ) : Input()
+
+        data class PutToStateIfPresent(
             val key: String,
             val valueProvider: (Any) -> Any,
+            val persistClearing: Boolean = false,
+        ) : Input()
+
+        data class PutToStorageIfPresent(
+            val key: String,
             val retriever: () -> Flow<Any>,
-            val persister: () -> Unit,
+            val persister: (Any) -> Unit,
             val persistClearing: Boolean = false,
         ) : Input()
 

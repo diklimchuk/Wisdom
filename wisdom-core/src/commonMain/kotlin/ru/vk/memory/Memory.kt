@@ -1,9 +1,8 @@
-package com.vkontakte.wisdom.flow
+package ru.vk.memory
 
-import com.vkontakte.wisdom.memory.MemoryEvent
-import com.vkontakte.wisdom.old.Cache
-import com.vkontakte.wisdom.old.CacheElement
-import com.vkontakte.wisdom.unsafeAs
+import ru.vk.old.Cache
+import ru.vk.old.CacheElement
+import ru.vk.unsafeAs
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -15,15 +14,14 @@ import money.vivid.elmslie.core.plot.CoroutinesElmPlot
 import money.vivid.elmslie.core.plot.ElmPlot
 import money.vivid.elmslie.core.plot.NoOpPerformer
 
-class FlowCache<T>(
-    private val flowProvider: () -> Flow<T>,
-    private val dispatcher: CoroutineDispatcher = TussaudConfig.elmDispatcher,
+class Memory(
+    private val dispatcher: CoroutineDispatcher = TussaudConfig.elmDispatcher
 ) : Cache {
 
     //    private val plot = SingleDispatcherElmPlot(
     private val plot = CoroutinesElmPlot(
         plot = ElmPlot(
-            scheme = FlowCacheScheme,
+            scheme = MemoryScheme,
             performer = NoOpPerformer()
         ),
         dispatcher = dispatcher,
@@ -51,6 +49,22 @@ class FlowCache<T>(
         plot.accept(MemoryEvent.Input.Put(key, valueProvider, persistClearing))
     }
 
+    override fun <T : Any> put(
+        key: String,
+        valueFlowProvider: () -> Flow<T>,
+        persistClearing: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun <T : Any> putIfPresent(
+        key: String,
+        valueFlowProvider: () -> Flow<T>,
+        persistClearing: Boolean
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override fun <T : Any> putIfPresent(
         key: String,
         valueProvider: (previousValue: T) -> T,
@@ -63,22 +77,22 @@ class FlowCache<T>(
         plot.accept(MemoryEvent.Input.Remove(key))
     }
 
-    override fun <T : Any> peek(key: String): T? {
+    override suspend fun <T : Any> peek(key: String): T? {
         @Suppress("UNCHECKED_CAST")
-        return plot.acceptWithResult<FlowCacheEffect.ElementReturned>(MemoryEvent.Input.Peek(key)).value as? T
+        return plot.acceptWithResult<MemoryEffect.ElementReturned>(MemoryEvent.Input.Peek(key)).value as? T
     }
 
     override fun <T : Any> observe(key: String): Flow<T?> {
         return plot.effects
             .flowOn(dispatcher)
-            .filterIsInstance<FlowCacheEffect.ElementChanged<*>>()
+            .filterIsInstance<MemoryEffect.ElementChanged<*>>()
             .filter { it.key == key }
             .map { it.value }
             .map { it.unsafeAs() }
     }
 
     override fun contains(key: String): Boolean {
-        return plot.acceptWithResult<FlowCacheEffect.ContainsResult>(MemoryEvent.Input.CheckContains(key)).doesContain
+        return plot.acceptWithResult<MemoryEffect.ContainsResult>(MemoryEvent.Input.CheckContains(key)).doesContain
     }
 
     override fun <T : Any> of(key: String, persistClearing: Boolean): CacheElement<T> {

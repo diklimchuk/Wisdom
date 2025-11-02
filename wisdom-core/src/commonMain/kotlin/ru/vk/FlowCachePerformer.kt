@@ -1,4 +1,4 @@
-package com.vkontakte.wisdom.flow
+package ru.vk.flow
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

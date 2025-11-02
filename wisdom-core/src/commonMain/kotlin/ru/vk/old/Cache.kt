@@ -1,23 +1,29 @@
-package com.vkontakte.wisdom.old
+package ru.vk.old
 
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.typeOf
 
-interface Cache {
+interface Cache<T : Any> {
 
-    fun <T : Any> put(
+    fun put(
         key: String,
         value: T,
         persistClearing: Boolean = false,
     )
 
-    fun <T : Any> put(
+    fun put(
         key: String,
         valueProvider: (previousValue: T?) -> T,
         persistClearing: Boolean = false,
     )
 
-    fun <T : Any> putIfPresent(
+    fun put(
+        key: String,
+        valueFlowProvider: () -> Flow<T>,
+        persistClearing: Boolean = false,
+    )
+
+    fun putIfPresent(
         key: String,
         valueProvider: (previousValue: T) -> T,
         persistClearing: Boolean = false,
@@ -25,13 +31,13 @@ interface Cache {
 
     fun remove(key: String)
 
-    fun <T : Any> peek(key: String): T?
+    suspend fun peek(key: String): T?
 
-    fun <T : Any> observe(key: String): Flow<T?>
+    fun observe(key: String): Flow<T?>
 
     fun contains(key: String): Boolean
 
-    fun <T : Any> of(
+    fun of(
         key: String,
         persistClearing: Boolean,
     ): CacheElement<T>
@@ -39,12 +45,12 @@ interface Cache {
     /**
      * Clears data in cache and all previously returned [CacheElement]s, except then ones created with keepAlways = true
      */
-    fun clear()
+    suspend fun clear()
 
     /**
      * Clears all data even the one with persistClearing=true
      */
-    fun clearWithPersistable()
+    suspend fun clearWithPersistable()
 
     suspend fun updateIfEmpty(key: String)
 
@@ -54,7 +60,7 @@ interface Cache {
 }
 
 
-inline fun <reified T : Any> Cache.of(
+inline fun <reified T : Any> Cache<T>.of(
     keepAlways: Boolean = false,
 ): CacheElement<T> {
     val key = typeOf<T>().toString()

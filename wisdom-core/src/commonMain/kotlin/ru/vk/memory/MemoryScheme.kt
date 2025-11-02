@@ -1,8 +1,8 @@
-package com.vkontakte.wisdom.memory
+package ru.vk.memory
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
 import co.touchlab.stately.collections.ConcurrentMutableSet
-import com.vkontakte.wisdom.old.Option
+import ru.vk.old.Option
 import money.vivid.elmslie.core.plot.ElmScheme
 import money.vivid.elmslie.core.plot.dsl.SchemePartBuilder
 

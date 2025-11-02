@@ -1,8 +1,8 @@
-package com.vkontakte.wisdom.flow
+package ru.vk.flow
 
 import co.touchlab.stately.collections.ConcurrentMutableMap
 import co.touchlab.stately.collections.ConcurrentMutableSet
-import com.vkontakte.wisdom.old.Option
+import ru.vk.old.Option
 import money.vivid.elmslie.core.plot.ElmScheme
 import money.vivid.elmslie.core.plot.dsl.SchemePartBuilder
 
@@ -18,7 +18,7 @@ object FlowCacheScheme : ElmScheme<FlowCacheState, FlowCacheEvent.Input, FlowCac
             }
         }
 
-        is FlowCacheEvent.Input.Put -> {
+        is FlowCacheEvent.Input.PutToState -> {
             if (event.persistClearing) {
                 state.clearableKeys.remove(event.key)
             } else {
@@ -30,7 +30,33 @@ object FlowCacheScheme : ElmScheme<FlowCacheState, FlowCacheEvent.Input, FlowCac
             effects { +FlowCacheEffect.ElementChanged(event.key, newValue) }
         }
 
-        is FlowCacheEvent.Input.PutIfPresent -> {
+        is FlowCacheEvent.Input.PutToStorage -> {
+            // TODO:
+            if (event.persistClearing) {
+                state.clearableKeys.remove(event.key)
+            } else {
+                state.clearableKeys.add(event.key)
+            }
+            val newValue = (event.valueProvider as (Any?) -> Any)(state.elements[event.key]?.value)
+            @Suppress("UNCHECKED_CAST")
+            state.elements[event.key] = Option(newValue)
+            effects { +FlowCacheEffect.ElementChanged(event.key, newValue) }
+        }
+
+        is FlowCacheEvent.Input.PutToStateIfPresent -> {
+            if (event.persistClearing) {
+                state.clearableKeys.remove(event.key)
+            } else {
+                state.clearableKeys.add(event.key)
+            }
+            val newValue = state.elements[event.key]?.value?.let { (event.valueProvider as (Any) -> Any)(it) }
+            @Suppress("UNCHECKED_CAST")
+            state.elements[event.key] = Option(newValue)
+            effects { +FlowCacheEffect.ElementChanged(event.key, newValue) }
+        }
+
+        is FlowCacheEvent.Input.PutToStorageIfPresent -> {
+            // TODO:
             if (event.persistClearing) {
                 state.clearableKeys.remove(event.key)
             } else {

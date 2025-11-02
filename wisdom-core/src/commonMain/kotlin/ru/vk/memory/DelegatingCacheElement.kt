@@ -1,7 +1,7 @@
-package com.vkontakte.wisdom.memory
+package ru.vk.memory
 
-import com.vkontakte.wisdom.old.Cache
-import com.vkontakte.wisdom.old.CacheElement
+import ru.vk.old.Cache
+import ru.vk.old.CacheElement
 import kotlinx.coroutines.flow.Flow
 
 internal class DelegatingCacheElement<T : Any>(
